@@ -46,8 +46,8 @@
 
 <div class="welcome-container">
     <div class="welcome-card">
-        <h1>Bienvenido al Sistema de Inventario</h1>
-        <p>Accede al sistema para gestionar el inventario de la empresa de manera eficiente y segura. Solo administradores y empleados autorizados tienen acceso.</p>
+        <h1>Bienvenido al Sistema de Selecciones</h1>
+        <p>Colegio Don Bosco</p>
         <a href="?view=login" class="btn btn-primary btn-block" id="btn-gotoLogin">Iniciar sesión</a>
     </div>
 </div>
