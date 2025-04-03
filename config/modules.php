@@ -6,6 +6,6 @@ $action = (isset($_POST['action'])) ? $_POST['action'] : '';
 
 if ($process == 'login') {
     include("./process/login.php");
-} else if ($process == 'inventario_process') {
-    include("./process/inventario_process.php");
+} else if ($process == 'seleccionador_process') {
+    include("./process/seleccionador_process.php");
 }
