@@ -3,43 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mockup con Cards y Botón Agregar</title>
+    <title>Mockup con Observaciones</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        /* Basic styles for card layout */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust minmax as needed */
-            gap: 1rem;
-        }
-
-        .player-card {
-            background-color: #fff;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .player-card img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 0.5rem;
-        }
-
-        .player-card h3 {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 0.25rem;
-        }
-
-        .player-card p {
-            font-size: 0.875rem;
-            color: #6b7280; /* text-gray-600 */
-        }
-    </style>
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="container mx-auto p-4">
@@ -97,42 +62,58 @@
 
             <main class="flex-1 flex flex-col">
                 <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center justify-between">
-                    <h2 class="text-xl font-semibold">Jugadores</h2>
+                    <h2 class="text-xl font-semibold">Observaciones</h2>
                     <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Agregar
+                        Nueva Observacion
                     </button>
                 </div>
-                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
-                    <div class="card-grid">
-                        <div class="player-card">
-                            <img src="../img/coach/random.png" alt="Player 1">
-                            <h3>Juan Jose</h3>
-                            <p>Delantero</p>
+
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <div>
+                        <textarea class="w-full h-24 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type your comment here"></textarea>
+                    </div>
+
+                    <div class="mt-4 space-y-4">
+                        <div class="bg-gray-100 rounded-md p-4">
+                            <div class="flex items-start space-x-4">
+                                <img src="https://via.placeholder.com/32" alt="Sofia Gutierrez" class="rounded-full w-8 h-8">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h3 class="font-semibold text-gray-800">Sofia Gutierrez</h3>
+                                        <span class="text-gray-500 text-sm">Hace 1 hora</span>
+                                    </div>
+                                    <p class="text-gray-700">No presento un Excelente Comportamiento</p>
+                                    <p class="text-gray-600 text-sm">Categoria sub16 futbol</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="player-card">
-                            <img src="../img/coach/random.png" alt="Player 2">
-                            <h3>Juan Jose</h3>
-                            <p>Mediocampista</p>
+
+                        <div class="bg-gray-100 rounded-md p-4">
+                            <div class="flex items-start space-x-4">
+                                <img src="https://via.placeholder.com/32" alt="Sophey Paul" class="rounded-full w-8 h-8">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h3 class="font-semibold text-gray-800">Sophey Paul</h3>
+                                        <span class="text-gray-500 text-sm">Hace 1 hora</span>
+                                    </div>
+                                    <p class="text-gray-700">No presento un Excelente Comportamiento</p>
+                                    <p class="text-gray-600 text-sm">Categoria sub16 futbol</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="player-card">
-                            <img src="../img/coach/random.png" alt="Player 3">
-                            <h3>Juan Jose</h3>
-                            <p>Defensa</p>
-                        </div>
-                        <div class="player-card">
-                            <img src="../img/coach/random.png" alt="Player 4">
-                            <h3>Juan Jose</h3>
-                            <p>Portero</p>
-                        </div>
-                        <div class="player-card">
-                            <img src="../img/coach/random.png" alt="Player 5">
-                            <h3>Juan Jose</h3>
-                            <p>Delantero</p>
-                        </div>
-                        <div class="player-card">
-                            <img src="../img/coach/random.png" alt="Player 6">
-                            <h3>Juan Jose</h3>
-                            <p>Mediocampista</p>
+
+                        <div class="bg-gray-100 rounded-md p-4">
+                            <div class="flex items-start space-x-4">
+                                <img src="https://via.placeholder.com/32" alt="John Selese" class="rounded-full w-8 h-8">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h3 class="font-semibold text-gray-800">John Selese</h3>
+                                        <span class="text-gray-500 text-sm">Hace 1 hora</span>
+                                    </div>
+                                    <p class="text-gray-700">No presento un Excelente Comportamiento</p>
+                                    <p class="text-gray-600 text-sm">Categoria sub16 futbol</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
