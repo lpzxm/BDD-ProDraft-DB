@@ -11,40 +11,171 @@
             background-color: #6d28d9; /* Example active color */
             color: white;
         }
+        /* Modal Styles */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* Adjusted top margin */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 500px; /* Added a maximum width */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: #374151;
+            focus:outline-none focus:ring-2 focus:ring-indigo-500;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .modal-footer button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .modal-footer .cancel-button {
+            background-color: #6b7280;
+        }
+
+        .modal-footer .cancel-button:hover {
+            background-color: #4a5568;
+        }
+
+        .modal-footer .save-button {
+            background-color: #6366f1;
+        }
+
+        .modal-footer .save-button:hover {
+            background-color: #4f46e5;
+        }
+
+        /* Style for the file input to make it look better */
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+            border: 1px dashed #d1d5db;
+            background-color: #f9fafb;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group input[type="file"]::-webkit-file-upload-button {
+            background-color: #e5e7eb;
+            border: none;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            background-color: #e5e7eb;
+            border: none;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100 h-screen flex font-sans">
 
-    <aside class="bg-indigo-700 text-white w-64 flex flex-col p-4">
+<aside class="bg-indigo-700 text-white w-64 flex flex-col p-4">
         <div class="mb-8">
             <h1 class="text-2xl font-semibold">Your Brand</h1>
         </div>
         <nav class="flex-1">
-            <a href="#" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
+            <a href="./index.php" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200 active">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2 12 3-3m0 6-3-3M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
                 Inicio
             </a>
-            <a href="#" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
+            <a href="./trainers.php" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372m-16.39-2.128a3.375 3.375 0 0 1 6.39-.372zm0-5.25a3.375 3.375 0 0 1 6.39.372m-6.39 2.128a9.38 9.38 0 0 0 2.625-.372m9.9-2.128a3.375 3.375 0 0 1 6.39.372m-6.39 5.25a3.375 3.375 0 0 1 6.39-.372m-3.98-11.008a13.024 13.024 0 0 1 3.495 0" />
                 </svg>
                 Entrenadores
             </a>
-            <a href="#" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200 active">
+            <a href="./categories.php" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
                 </svg>
                 Categorias
             </a>
-            <a href="#" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
+            <a href="./profiles.php" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0zM4.501 20.125a15.63 15.63 0 0 1 15.998-7.5M4.501 20.125a15.65 15.65 0 0 0-2.25-3.75c-1.034-1.94-2.285-3.482-4.112-4.636m15.998-7.5a15.63 15.63 0 0 1-15.998 7.5M19.5 10.125a15.657 15.657 0 0 0 2.25-3.75c1.034-1.94 2.285-3.482 4.112-4.636" />
                 </svg>
                 Perfiles
             </a>
-            <a href="#" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
+            <a href="./observations.php" class="sidebar-link flex items-center p-3 -mx-3 rounded-md hover:bg-indigo-600 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.704 14.21 14.21 0 0 1 13.053-5.457.999.999 0 0 1 .708 0l3.96 3.96a.999.999 0 0 1 0 1.414l-7.07 7.07a.999.999 0 0 1-.707 0 14.21 14.21 0 0 1-13.053 5.457.999.999 0 0 1-.708 0Z" />
                 </svg>
@@ -101,8 +232,8 @@
                     <button class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
                         Borrar
                     </button>
-                    <button class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Buscar
+                    <button class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
+                        Borrar
                     </button>
                 </div>
             </section>
@@ -110,7 +241,7 @@
             <section class="bg-white shadow-md rounded-lg p-6 overflow-x-auto">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-700">Lista de Categorias</h3>
-                    <button class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    <button id="openNewCategoryModalBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 inline-block mr-1">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
@@ -212,14 +343,51 @@
                                 </button>
                             </td>
                         </tr>
-                        </tbody>
+                    </tbody>
                 </table>
             </section>
         </main>
     </div>
 
+    <div id="newCategoryModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Categoria</h2>
+                <span class="close-button" id="closeNewCategoryModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="categoryName">Nombre</label>
+                        <input type="text" id="categoryName" placeholder="Ej: Sub 15">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryDescription">Descripción</label>
+                        <input type="text" id="categoryDescription" placeholder="Ej: Jugadores menores de 15 años">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryRules">Reglas</label>
+                        <textarea id="categoryRules" placeholder="Ingrese las reglas de la categoría"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryImage">Imagen</label>
+                        <input type="file" id="categoryImage">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelNewCategoryModalBtn" class="cancel-button">Cancelar</button>
+                <button type="button" class="save-button">Guardar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const openNewCategoryModalBtn = document.getElementById('openNewCategoryModalBtn');
+        const closeNewCategoryModalBtn = document.getElementById('closeNewCategoryModalBtn');
+        const cancelNewCategoryModalBtn = document.getElementById('cancelNewCategoryModalBtn');
+        const newCategoryModal = document.getElementById('newCategoryModal');
 
         sidebarLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -229,6 +397,24 @@
                 link.classList.add('active');
                 // You can add logic here to load content based on the clicked link
             });
+        });
+
+        openNewCategoryModalBtn.addEventListener('click', () => {
+            newCategoryModal.style.display = 'block';
+        });
+
+        closeNewCategoryModalBtn.addEventListener('click', () => {
+            newCategoryModal.style.display = 'none';
+        });
+
+        cancelNewCategoryModalBtn.addEventListener('click', () => {
+            newCategoryModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == newCategoryModal) {
+                newCategoryModal.style.display = 'none';
+            }
         });
     </script>
 
