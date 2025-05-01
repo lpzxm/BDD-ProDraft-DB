@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
 <link rel="shortcut icon" href="../assets/icon_meta.png" type="image/x-icon">
 
-<title>Inventario Willy's - <?php echo date('Y') ?></title>
+<title>ProDraft Colegio Don Bosco - <?php echo date('Y') ?></title>
 
 <style>
     body {
