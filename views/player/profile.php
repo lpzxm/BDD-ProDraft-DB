@@ -1,26 +1,96 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Jugador - Sub17</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+ .hamburger-menu {
+            display: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .line {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+
+        .open .line1 {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .open .line2 {
+            opacity: 0;
+        }
+
+        .open .line3 {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 6rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-gray-700 hover: text-indigo-500 transition-colors;
+        }
+
+        @media (max-width: 768px) {
+            .main-nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                /* Hide links on smaller screens */
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                /* Adjust based on header height */
+                right: 0;
+                background-color: #fff;
+                width: 100%;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                z-index: 10;
+                gap: 1rem;
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
         }
-        
+
         .player-card {
             background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
             border-radius: 16px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e7eb;
         }
-        
+
         .metric-card {
             background: white;
             border-radius: 12px;
@@ -28,13 +98,13 @@
             border: 1px solid #f3f4f6;
             transition: all 0.2s ease;
         }
-        
+
         .metric-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
             border-color: #e5e7eb;
         }
-        
+
         .metric-badge {
             display: inline-flex;
             align-items: center;
@@ -47,32 +117,32 @@
             color: #2563eb;
             border: 1px solid #dbeafe;
         }
-        
+
         .data-table {
             border-collapse: separate;
             border-spacing: 0;
         }
-        
+
         .data-table th {
             background-color: #f9fafb;
             font-weight: 600;
             color: #4b5563;
             border-bottom: 1px solid #e5e7eb;
         }
-        
+
         .data-table td {
             border-bottom: 1px solid #f3f4f6;
         }
-        
+
         .data-table tr:last-child td {
             border-bottom: none;
         }
-        
+
         .indicator-item {
             position: relative;
             padding-left: 1.5rem;
         }
-        
+
         .indicator-item:before {
             content: "";
             position: absolute;
@@ -83,12 +153,12 @@
             border-radius: 50%;
             background-color: #3b82f6;
         }
-        
+
         .time-slot {
             position: relative;
             padding-left: 1.25rem;
         }
-        
+
         .time-slot:before {
             content: "→";
             position: absolute;
@@ -96,26 +166,50 @@
             color: #9ca3af;
             font-weight: bold;
         }
-        
+
         .section-divider {
             border-top: 1px dashed #e5e7eb;
         }
     </style>
 </head>
+
 <body class="bg-gray-50 text-gray-800">
+    <header class="main-nav flex justify-between items-center px-4 py-3">
+        <div class="font-bold text-xl text-gray-800">Our Brand</div>
+        <div class="flex items-center">
+            <!-- HACER CODE QUE CUANDO ESTE LOGEADO DESAPAREZCA O ESTE EL LOGPUT -->
+            <a href="login.php"
+                class="mr-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                Login
+            </a>
+
+            <nav>
+                <div class="hamburger-menu" id="hamburger">
+                    <div class="line line1"></div>
+                    <div class="line line2"></div>
+                    <div class="line line3"></div>
+                </div>
+                <div class="nav-links" id="navLinks">
+                    <a href="index.php">Home</a>
+                    <a href="categories.php">Cattegories</a>
+                    <a href="statistics.php">Stadisticas</a>
+                    <a href="profile.php">Profile</a>
+                </div>
+            </nav>
+        </div>
+    </header>
     <div class="max-w-5xl mx-auto p-6">
         <div class="player-card p-8 mb-8">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-8">
                 <div class="w-40 h-40 rounded-xl bg-gray-100 overflow-hidden border-4 border-white shadow-md">
-                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80" 
-                         alt="Jugador Sub17" 
-                         class="w-full h-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&h=400&q=80"
+                        alt="Jugador Sub17" class="w-full h-full object-cover">
                 </div>
-                
+
                 <div class="flex-1">
                     <h1 class="text-3xl font-bold text-gray-900 mb-1">Juan Jose</h1>
                     <p class="text-lg text-gray-600 mb-4">Delantero - Categoría Sub17</p>
-                    
+
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <p class="text-sm text-gray-500">Edad</p>
@@ -146,7 +240,7 @@
                     <span class="metric-badge">92%</span>
                 </div>
             </div>
-            
+
             <div class="metric-card p-5">
                 <h3 class="text-sm font-semibold text-gray-500 mb-2">Goles</h3>
                 <div class="flex items-center justify-between">
@@ -155,7 +249,7 @@
                 </div>
                 <p class="text-xs text-gray-500 mt-1">Promedio por partido</p>
             </div>
-            
+
             <div class="metric-card p-5">
                 <h3 class="text-sm font-semibold text-gray-500 mb-2">Asistencias</h3>
                 <div class="flex items-center justify-between">
@@ -164,7 +258,7 @@
                 </div>
                 <p class="text-xs text-gray-500 mt-1">Promedio por partido</p>
             </div>
-            
+
             <div class="metric-card p-5">
                 <h3 class="text-sm font-semibold text-gray-500 mb-2">Rendimiento</h3>
                 <div class="flex items-center justify-between">
@@ -179,8 +273,9 @@
             <div class="lg:col-span-2 space-y-6">
                 <div class="metric-card p-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Asistencia a Entrenamientos</h2>
-                    <p class="text-gray-600 mb-4">Registro de asistencia a sesiones de entrenamiento en los últimos 3 meses.</p>
-                    
+                    <p class="text-gray-600 mb-4">Registro de asistencia a sesiones de entrenamiento en los últimos 3
+                        meses.</p>
+
                     <div class="flex flex-wrap gap-3">
                         <div class="metric-badge">15</div>
                         <div class="metric-badge">16</div>
@@ -190,23 +285,23 @@
                         <div class="metric-badge">20</div>
                         <div class="metric-badge">21</div>
                     </div>
-                    
+
                     <div class="section-divider my-5"></div>
-                    
+
                     <div>
                         <h3 class="font-medium text-gray-700 mb-2">Resumen</h3>
                         <p class="text-sm text-gray-600">
-                            El jugador ha asistido al 92% de los entrenamientos programados, 
-                            mostrando un excelente compromiso con el equipo. Las ausencias 
+                            El jugador ha asistido al 92% de los entrenamientos programados,
+                            mostrando un excelente compromiso con el equipo. Las ausencias
                             corresponden a compromisos académicos justificados.
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="metric-card p-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Datos de Rendimiento</h2>
                     <p class="text-gray-600 mb-4">Métricas clave de los últimos 5 partidos oficiales.</p>
-                    
+
                     <div class="overflow-x-auto">
                         <table class="data-table w-full">
                             <thead>
@@ -252,12 +347,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="space-y-6">
                 <div class="metric-card p-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Indicadores Técnicos</h2>
                     <p class="text-gray-600 mb-4">Aspectos a mejorar según el cuerpo técnico.</p>
-                    
+
                     <ul class="space-y-3">
                         <li class="indicator-item">
                             <p class="text-gray-700">Mejorar el timing de los desmarques</p>
@@ -269,22 +364,22 @@
                             <p class="text-gray-700">Optimizar la toma de decisiones en presión</p>
                         </li>
                     </ul>
-                    
+
                     <div class="section-divider my-5"></div>
-                    
+
                     <div>
                         <h3 class="font-medium text-gray-700 mb-2">Progreso</h3>
                         <p class="text-sm text-gray-600">
-                            El jugador muestra buena disposición para trabajar en sus aspectos 
+                            El jugador muestra buena disposición para trabajar en sus aspectos
                             débiles, con una mejora del 15% en los ejercicios específicos.
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="metric-card p-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Horario de Entrenamiento</h2>
                     <p class="text-gray-600 mb-4">Próximas sesiones programadas.</p>
-                    
+
                     <div class="space-y-3">
                         <div>
                             <p class="font-medium text-gray-700">Lunes 12/06</p>
@@ -306,7 +401,8 @@
                 </div>
             </div>
         </div>
-   
+
     </div>
 </body>
+
 </html>

@@ -6,6 +6,77 @@
     <title>Estadísticas Generales</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
+         .hamburger-menu {
+            display: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .line {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+
+        .open .line1 {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .open .line2 {
+            opacity: 0;
+        }
+
+        .open .line3 {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 6rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-gray-700 hover: text-indigo-500 transition-colors;
+        }
+
+        @media (max-width: 768px) {
+            .main-nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                /* Hide links on smaller screens */
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                /* Adjust based on header height */
+                right: 0;
+                background-color: #fff;
+                width: 100%;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                z-index: 10;
+                gap: 1rem;
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+        }
         .stat-card {
             background-color: #ffffff;
             border-radius: 12px;
@@ -72,8 +143,31 @@
     </style>
 </head>
 <body class="bg-gray-50 p-6">
+<header class="main-nav flex justify-between items-center px-4 py-3">
+        <div class="font-bold text-xl text-gray-800">Our Brand</div>
+        <div class="flex items-center">
+            <!-- HACER CODE QUE CUANDO ESTE LOGEADO DESAPAREZCA O ESTE EL LOGPUT -->
+            <a href="login.php"
+                class="mr-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                Login
+            </a>
+
+            <nav>
+                <div class="hamburger-menu" id="hamburger">
+                    <div class="line line1"></div>
+                    <div class="line line2"></div>
+                    <div class="line line3"></div>
+                </div>
+                <div class="nav-links" id="navLinks">
+                    <a href="index.php">Home</a>
+                    <a href="categories.php">Cattegories</a>
+                    <a href="statistics.php">Stadisticas</a>
+                    <a href="profile.php">Profile</a>
+                </div>
+            </nav>
+        </div>
+    </header>
     <div class="max-w-6xl mx-auto">
-        <!-- Encabezado mejorado -->
         <div class="header-section p-6 mb-6 shadow-lg">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div class="mb-4 md:mb-0">
@@ -105,9 +199,7 @@
             </div>
         </div>
         
-        <!-- Tarjetas de estadísticas -->
         <div class="flex flex-col md:flex-row gap-6 stats-container">
-            <!-- Primer Card -->
             <div class="stat-card p-6 flex-1">
                 <div class="flex justify-between items-center mb-6 day-progress">
                     <h4 class="font-semibold text-gray-700 text-lg">Bounce Rate</h4>
@@ -158,7 +250,6 @@
                 </div>
             </div>
             
-            <!-- Segundo Card -->
             <div class="stat-card p-6 flex-1">
                 <div class="flex justify-between items-center mb-6 day-progress">
                     <h4 class="font-semibold text-gray-700 text-lg">Tiempo promedio</h4>

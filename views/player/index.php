@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Work & Statistics</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Custom styles */
         .hero-section {
             background-color: #f7f7f7;
         }
@@ -27,7 +27,8 @@
         }
 
         .hamburger-menu {
-            display: none; /* Hidden by default on larger screens */
+            display: none;
+            /* Hidden by default on larger screens */
             cursor: pointer;
             padding: 10px;
         }
@@ -56,7 +57,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 6rem; /* Adjust padding as needed */
+            padding: 1rem 6rem;
+            /* Adjust padding as needed */
         }
 
         .nav-links {
@@ -65,7 +67,7 @@
         }
 
         .nav-links a {
-            text-gray-700 hover:text-indigo-500 transition-colors;
+            text-gray-700 hover: text-indigo-500 transition-colors;
         }
 
         /* Responsive Styles */
@@ -75,10 +77,12 @@
             }
 
             .nav-links {
-                display: none; /* Hide links on smaller screens */
+                display: none;
+                /* Hide links on smaller screens */
                 flex-direction: column;
                 position: absolute;
-                top: 60px; /* Adjust based on header height */
+                top: 60px;
+                /* Adjust based on header height */
                 right: 0;
                 background-color: #fff;
                 width: 100%;
@@ -93,47 +97,66 @@
             }
 
             .hamburger-menu {
-                display: block; /* Show hamburger menu on smaller screens */
+                display: block;
+                /* Show hamburger menu on smaller screens */
             }
         }
     </style>
 </head>
+
 <body class="bg-gray-100">
-    <header class="main-nav">
+    <header class="main-nav flex justify-between items-center px-4 py-3">
         <div class="font-bold text-xl text-gray-800">Our Brand</div>
-        <nav>
-            <div class="hamburger-menu" id="hamburger">
-                <div class="line line1"></div>
-                <div class="line line2"></div>
-                <div class="line line3"></div>
-            </div>
-            <div class="nav-links" id="navLinks">
-                <a href="#">Home</a>
-                <a href="#">Services</a>
-                <a href="#">Work</a>
-                <a href="#">Contact</a>
-            </div>
-        </nav>
+        <div class="flex items-center">
+            <!-- HACER CODE QUE CUANDO ESTE LOGEADO DESAPAREZCA O ESTE EL LOGPUT -->
+            <a href="login.php"
+                class="mr-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-300">
+                Login
+            </a>
+
+            <nav>
+                <div class="hamburger-menu" id="hamburger">
+                    <div class="line line1"></div>
+                    <div class="line line2"></div>
+                    <div class="line line3"></div>
+                </div>
+                <div class="nav-links" id="navLinks">
+                    <a href="index.php">Home</a>
+                    <a href="categories.php">Cattegories</a>
+                    <a href="statistics.php">Stadisticas</a>
+                    <a href="profile.php">Profile</a>
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <div class="container mx-auto p-8 mt-8 md:mt-0"> <section class="hero-section py-16 rounded-lg shadow-md mb-8">
+    <div class="container mx-auto p-8 mt-8 md:mt-0">
+        <section class="hero-section py-16 rounded-lg shadow-md mb-8">
             <div class="container mx-auto px-6 flex items-center justify-between">
                 <div class="text-left">
                     <h1 class="text-3xl font-bold text-gray-800 mb-4">Let's build products together for life</h1>
-                    <p class="text-gray-600 mb-6">Our award-winning platform is a product agency that refines people, unlocks value, & drives development.</p>
-                    <a href="#" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-6 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-400">Our services</a>
+                    <p class="text-gray-600 mb-6">Our award-winning platform is a product agency that refines people,
+                        unlocks value, & drives development.</p>
+                    <a href="#"
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-6 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-400">Our
+                        services</a>
                 </div>
-                <img src="https://i.ibb.co/zQ1yTfC/basketball-boy.png" alt="Boy with Basketball" class="max-w-sm rounded-lg shadow-lg">
+                <img src="https://i.ibb.co/zQ1yTfC/basketball-boy.png" alt="Boy with Basketball"
+                    class="max-w-sm rounded-lg shadow-lg">
             </div>
         </section>
 
         <section class="py-8 mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-6">Our Latest Work</h2>
-            <p class="text-gray-600 mb-4">Shared is a digital solution for a product agency that refines people, unlocks value, & drives development.</p>
+            <p class="text-gray-600 mb-4">Shared is a digital solution for a product agency that refines people, unlocks
+                value, & drives development.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="work-item rounded-lg p-6">
                     <div class="bg-black aspect-w-16 aspect-h-9 rounded-md mb-4">
-                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerate; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player"
+                            frameborder="0"
+                            allow="accelerate; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
                     </div>
                     <h3 class="text-lg font-semibold text-indigo-700 mb-2">Candle - Mobile App</h3>
                     <p class="text-gray-500 text-sm">UI/UX Design</p>
@@ -165,7 +188,8 @@
                     <div class="stats-card rounded-lg p-6 text-center">
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">Bounce Rate</h3>
                         <div class="relative inline-block w-24 h-24 rounded-full bg-gray-200">
-                            <div class="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-yellow-400 flex items-center justify-center">
+                            <div
+                                class="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-yellow-400 flex items-center justify-center">
                                 <span class="text-xl font-bold text-gray-800">23%</span>
                             </div>
                         </div>
@@ -175,7 +199,8 @@
                     <div class="stats-card rounded-lg p-6 text-center">
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">Bounce Rate</h3>
                         <div class="relative inline-block w-24 h-24 rounded-full bg-gray-200">
-                            <div class="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-yellow-400 flex items-center justify-center">
+                            <div
+                                class="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-yellow-400 flex items-center justify-center">
                                 <span class="text-xl font-bold text-gray-800">23%</span>
                             </div>
                         </div>
@@ -198,4 +223,5 @@
         });
     </script>
 </body>
+
 </html>
