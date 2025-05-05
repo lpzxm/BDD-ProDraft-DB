@@ -5,7 +5,7 @@ $process = (isset($_POST['process'])) ? $_POST['process'] : '';
 $action = (isset($_POST['action'])) ? $_POST['action'] : '';
 
 if ($process == 'login') {
-    include("./process/login.php");
+    include("./process/auth/login.php");
 } else if ($process == 'seleccionador_process') {
     include("./process/seleccionador_process.php");
 }

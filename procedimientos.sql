@@ -1292,3 +1292,46 @@ BEGIN
     INSERT INTO Bitacora_Auditoria (usuario, tabla_afectada, tipo_operacion)
     VALUES (SYSTEM_USER, 'Observaciones_Entrenador', @accion);
 END;
+
+INSERT INTO Entrenador (
+    email, 
+    contraseña, 
+    nombres, 
+    fechaNacimiento, 
+    id_sport, 
+    descripcion, 
+    cloudinary_id, 
+    url
+)
+VALUES (
+    'juanperez@example.com', 
+    'hashed_password_aqui', 
+    'Juan Pérez', 
+    '1990-06-15', 
+    1, 
+    'Entrenador con experiencia en fútbol juvenil.', 
+    'cloudinary12345', 
+    'https://res.cloudinary.com/demo/image/upload/v123456/juan.jpg'
+);
+
+INSERT INTO DeporDeporte(
+    email, 
+    contraseña, 
+    nombres, 
+    fechaNacimiento, 
+    id_sport, 
+    descripcion, 
+    cloudinary_id, 
+    url
+)
+VALUES (
+    'juanperez@example.com', 
+    'hashed_password_aqui', 
+    'Juan Pérez', 
+    '1990-06-15', 
+    1, 
+    'Entrenador con experiencia en fútbol juvenil.', 
+    'cloudinary12345', 
+    'https://res.cloudinary.com/demo/image/upload/v123456/juan.jpg'
+);
+
