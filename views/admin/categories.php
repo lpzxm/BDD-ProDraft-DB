@@ -80,7 +80,7 @@
             box-sizing: border-box;
             font-size: 1rem;
             color: #374151;
-            focus:outline-none focus:ring-2 focus:ring-indigo-500;
+            /* focus:outline-none focus:ring-2 focus:ring-indigo-500; */
         }
 
         .modal-footer {
