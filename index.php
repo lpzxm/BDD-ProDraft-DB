@@ -16,3 +16,5 @@ session_start();
     ?>
 </body>
 </html>
+
+dnf install bind bind-utils -y  
