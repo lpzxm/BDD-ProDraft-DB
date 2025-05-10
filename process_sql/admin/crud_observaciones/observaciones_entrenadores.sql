@@ -1,5 +1,6 @@
---CREAR
-
+-- =============================================
+-- Procedimiento para crear observación de entrenador con bitácora
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_CreateObservacionEntrenador]
     @admin_email NVARCHAR(255),
     @entrenador_email NVARCHAR(255),
@@ -29,13 +30,21 @@ BEGIN
             
         -- Insertar observación
         INSERT INTO [dbo].[Observaciones_Entrenador] (
-            [id_admin], [id_entrenador], [observacion]
+            [id_admin], [id_entrenador], [observacion], [fecha]
         )
         VALUES (
-            @admin_id, @entrenador_id, @observacion
+            @admin_id, @entrenador_id, @observacion, GETDATE()
         );
         
-        SELECT SCOPE_IDENTITY() AS id;
+        -- Registrar en bitácora
+        DECLARE @new_id INT = SCOPE_IDENTITY();
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Observaciones_Entrenador',
+            @accion = 'INSERT',
+            @valores_nuevos = (SELECT * FROM [dbo].[Observaciones_Entrenador] WHERE [id] = @new_id FOR JSON PATH);
+        
+        SELECT @new_id AS id;
     END TRY
     BEGIN CATCH
         THROW;
@@ -43,10 +52,14 @@ BEGIN
 END
 GO
 
---LEER
+-- =============================================
+-- Procedimiento para obtener observaciones de entrenadores (solo lectura)
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_GetObservacionesEntrenador]
     @admin_email NVARCHAR(255),
-    @entrenador_email NVARCHAR(255) = NULL
+    @entrenador_email NVARCHAR(255) = NULL,
+    @fecha_inicio DATE = NULL,
+    @fecha_fin DATE = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -56,6 +69,10 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM [dbo].[Admin] WHERE [email] = @admin_email)
             RAISERROR('Acceso no autorizado', 16, 1);
             
+        -- Validar rango de fechas
+        IF @fecha_inicio IS NOT NULL AND @fecha_fin IS NOT NULL AND @fecha_inicio > @fecha_fin
+            RAISERROR('La fecha de inicio no puede ser mayor a la fecha fin', 16, 1);
+            
         -- Obtener observaciones
         SELECT 
             o.[id],
@@ -63,11 +80,15 @@ BEGIN
             e.[email] AS entrenador,
             e.[nombres] AS nombre_entrenador,
             o.[observacion],
-            o.[fecha]
+            o.[fecha],
+            d.[nombre] AS deporte
         FROM [dbo].[Observaciones_Entrenador] o
         JOIN [dbo].[Admin] a ON o.[id_admin] = a.[id]
         JOIN [dbo].[Entrenador] e ON o.[id_entrenador] = e.[id]
+        JOIN [dbo].[Deporte] d ON e.[id_sport] = d.[id]
         WHERE (@entrenador_email IS NULL OR e.[email] = @entrenador_email)
+          AND (@fecha_inicio IS NULL OR CONVERT(DATE, o.[fecha]) >= @fecha_inicio)
+          AND (@fecha_fin IS NULL OR CONVERT(DATE, o.[fecha]) <= @fecha_fin)
         ORDER BY o.[fecha] DESC;
     END TRY
     BEGIN CATCH
@@ -76,7 +97,9 @@ BEGIN
 END
 GO
 
---ELIMINAR
+-- =============================================
+-- Procedimiento para eliminar observación de entrenador con bitácora
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_DeleteObservacionEntrenador]
     @admin_email NVARCHAR(255),
     @observacion_id INT
@@ -89,12 +112,27 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM [dbo].[Admin] WHERE [email] = @admin_email)
             RAISERROR('Acceso no autorizado', 16, 1);
             
+        -- Validar que la observación existe
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[Observaciones_Entrenador] WHERE [id] = @observacion_id)
+            RAISERROR('Observación no encontrada', 16, 1);
+            
+        -- Guardar datos antiguos para bitácora
+        DECLARE @old_data NVARCHAR(MAX) = (
+            SELECT * FROM [dbo].[Observaciones_Entrenador] WHERE [id] = @observacion_id FOR JSON PATH
+        );
+            
         -- Eliminar observación
         DELETE FROM [dbo].[Observaciones_Entrenador]
         WHERE [id] = @observacion_id;
         
-        IF @@ROWCOUNT = 0
-            RAISERROR('Observación no encontrada', 16, 1);
+        -- Registrar en bitácora
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Observaciones_Entrenador',
+            @accion = 'DELETE',
+            @valores_anteriores = @old_data;
+        
+        SELECT 1 AS resultado;
     END TRY
     BEGIN CATCH
         THROW;

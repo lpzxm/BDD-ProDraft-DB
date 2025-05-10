@@ -27,35 +27,15 @@ BEGIN
         INSERT INTO [dbo].[Category_sport] ([id_sport], [nombre])
         VALUES (@deporte_id, @categoria_nombre);
         
-        SELECT SCOPE_IDENTITY() AS id;
-    END TRY
-    BEGIN CATCH
-        THROW;
-    END CATCH
-END
-GO
-
---LEER
-CREATE OR ALTER PROCEDURE [dbo].[Admin_GetCategorias]
-    @admin_email NVARCHAR(255),
-    @deporte_nombre NVARCHAR(255) = NULL
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    BEGIN TRY
-        -- Validar admin
-        IF NOT EXISTS (SELECT 1 FROM [dbo].[Admin] WHERE [email] = @admin_email)
-            RAISERROR('Acceso no autorizado', 16, 1);
-            
-        -- Obtener categorías
-        SELECT 
-            c.[id],
-            d.[nombre] AS deporte,
-            c.[nombre] AS categoria
-        FROM [dbo].[Category_sport] c
-        JOIN [dbo].[Deporte] d ON c.[id_sport] = d.[id]
-        WHERE (@deporte_nombre IS NULL OR d.[nombre] = @deporte_nombre);
+        -- Registrar en bitácora
+        DECLARE @new_id INT = SCOPE_IDENTITY();
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Category_sport',
+            @accion = 'INSERT',
+            @valores_nuevos = (SELECT * FROM [dbo].[Category_sport] WHERE [id] = @new_id FOR JSON PATH);
+        
+        SELECT @new_id AS id;
     END TRY
     BEGIN CATCH
         THROW;
@@ -81,6 +61,11 @@ BEGIN
         IF LEN(@nuevo_nombre) < 3
             RAISERROR('Nombre de categoría muy corto', 16, 1);
             
+        -- Guardar datos antiguos para bitácora
+        DECLARE @old_data NVARCHAR(MAX) = (
+            SELECT * FROM [dbo].[Category_sport] WHERE [id] = @categoria_id FOR JSON PATH
+        );
+            
         -- Actualizar categoría
         UPDATE [dbo].[Category_sport]
         SET [nombre] = @nuevo_nombre
@@ -88,6 +73,14 @@ BEGIN
         
         IF @@ROWCOUNT = 0
             RAISERROR('Categoría no encontrada', 16, 1);
+            
+        -- Registrar en bitácora
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Category_sport',
+            @accion = 'UPDATE',
+            @valores_anteriores = @old_data,
+            @valores_nuevos = (SELECT * FROM [dbo].[Category_sport] WHERE [id] = @categoria_id FOR JSON PATH);
     END TRY
     BEGIN CATCH
         THROW;
@@ -95,7 +88,9 @@ BEGIN
 END
 GO
 
+
 --ELIMINAR
+
 CREATE OR ALTER PROCEDURE [dbo].[Admin_DeleteCategoria]
     @admin_email NVARCHAR(255),
     @categoria_id INT
@@ -112,12 +107,24 @@ BEGIN
         IF EXISTS (SELECT 1 FROM [dbo].[Category_players] WHERE [id_category] = @categoria_id)
             RAISERROR('No se puede eliminar, la categoría tiene jugadores asignados', 16, 1);
             
+        -- Guardar datos antiguos para bitácora
+        DECLARE @old_data NVARCHAR(MAX) = (
+            SELECT * FROM [dbo].[Category_sport] WHERE [id] = @categoria_id FOR JSON PATH
+        );
+            
         -- Eliminar categoría
         DELETE FROM [dbo].[Category_sport]
         WHERE [id] = @categoria_id;
         
         IF @@ROWCOUNT = 0
             RAISERROR('Categoría no encontrada', 16, 1);
+            
+        -- Registrar en bitácora
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Category_sport',
+            @accion = 'DELETE',
+            @valores_anteriores = @old_data;
     END TRY
     BEGIN CATCH
         THROW;

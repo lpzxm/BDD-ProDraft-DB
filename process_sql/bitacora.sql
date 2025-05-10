@@ -63,3 +63,34 @@ BEGIN
     END
 END
 GO
+
+
+
+--PROCEDIMIENTO
+
+CREATE OR ALTER PROCEDURE [dbo].[sp_RegistrarBitacora]
+    @usuario NVARCHAR(255),
+    @tabla NVARCHAR(255),
+    @accion NVARCHAR(50),
+    @valores_anteriores NVARCHAR(MAX) = NULL,
+    @valores_nuevos NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    INSERT INTO [dbo].[Bitacora] (
+        [usuario_sistema],
+        [nombre_tabla],
+        [transaccion],
+        [valores_anteriores],
+        [valores_nuevos]
+    )
+    VALUES (
+        @usuario,
+        @tabla,
+        @accion,
+        @valores_anteriores,
+        @valores_nuevos
+    );
+END
+GO

@@ -1,5 +1,6 @@
---CREAR
-
+-- =============================================
+-- Procedimiento para crear jugador con bitácora
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_CreateJugador]
     @admin_email NVARCHAR(255),
     @email NVARCHAR(255),
@@ -40,7 +41,15 @@ BEGIN
             @email, @contraseña, @nombres, @apellidos, @fechaNacimiento, @codigo
         );
         
-        SELECT SCOPE_IDENTITY() AS id;
+        -- Registrar en bitácora
+        DECLARE @new_id INT = SCOPE_IDENTITY();
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Jugador',
+            @accion = 'INSERT',
+            @valores_nuevos = (SELECT * FROM [dbo].[Jugador] WHERE [id] = @new_id FOR JSON PATH);
+        
+        SELECT @new_id AS id;
     END TRY
     BEGIN CATCH
         THROW;
@@ -48,8 +57,9 @@ BEGIN
 END
 GO
 
-
---LEER
+-- =============================================
+-- Procedimiento para obtener jugadores (solo lectura)
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_GetJugadores]
     @admin_email NVARCHAR(255),
     @filtro_nombre NVARCHAR(255) = NULL
@@ -70,7 +80,12 @@ BEGIN
             [apellidos],
             [fechaNacimiento],
             [codigo],
-            DATEDIFF(YEAR, [fechaNacimiento], GETDATE()) AS edad
+            DATEDIFF(YEAR, [fechaNacimiento], GETDATE()) AS edad,
+            [grado],
+            [seccion],
+            [status_img_academic],
+            [status_img_conduct],
+            [status_sport]
         FROM [dbo].[Jugador]
         WHERE 
             @filtro_nombre IS NULL OR 
@@ -83,15 +98,21 @@ BEGIN
 END
 GO
 
-
---ACTUALIZAR
+-- =============================================
+-- Procedimiento para actualizar jugador con bitácora
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_UpdateJugador]
     @admin_email NVARCHAR(255),
     @jugador_id INT,
     @nombres NVARCHAR(255) = NULL,
     @apellidos NVARCHAR(255) = NULL,
     @fechaNacimiento DATE = NULL,
-    @codigo INT = NULL
+    @codigo INT = NULL,
+    @grado NVARCHAR(50) = NULL,
+    @seccion NVARCHAR(50) = NULL,
+    @status_img_academic NVARCHAR(255) = NULL,
+    @status_img_conduct NVARCHAR(255) = NULL,
+    @status_sport NVARCHAR(255) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -100,6 +121,15 @@ BEGIN
         -- Validar admin
         IF NOT EXISTS (SELECT 1 FROM [dbo].[Admin] WHERE [email] = @admin_email)
             RAISERROR('Acceso no autorizado', 16, 1);
+            
+        -- Validar que el jugador existe
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[Jugador] WHERE [id] = @jugador_id)
+            RAISERROR('Jugador no encontrado', 16, 1);
+            
+        -- Guardar datos antiguos para bitácora
+        DECLARE @old_data NVARCHAR(MAX) = (
+            SELECT * FROM [dbo].[Jugador] WHERE [id] = @jugador_id FOR JSON PATH
+        );
             
         -- Validar código único si se actualiza
         IF @codigo IS NOT NULL AND EXISTS (
@@ -118,11 +148,23 @@ BEGIN
             [nombres] = ISNULL(@nombres, [nombres]),
             [apellidos] = ISNULL(@apellidos, [apellidos]),
             [fechaNacimiento] = ISNULL(@fechaNacimiento, [fechaNacimiento]),
-            [codigo] = ISNULL(@codigo, [codigo])
+            [codigo] = ISNULL(@codigo, [codigo]),
+            [grado] = ISNULL(@grado, [grado]),
+            [seccion] = ISNULL(@seccion, [seccion]),
+            [status_img_academic] = ISNULL(@status_img_academic, [status_img_academic]),
+            [status_img_conduct] = ISNULL(@status_img_conduct, [status_img_conduct]),
+            [status_sport] = ISNULL(@status_sport, [status_sport])
         WHERE [id] = @jugador_id;
         
-        IF @@ROWCOUNT = 0
-            RAISERROR('Jugador no encontrado', 16, 1);
+        -- Registrar en bitácora
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Jugador',
+            @accion = 'UPDATE',
+            @valores_anteriores = @old_data,
+            @valores_nuevos = (SELECT * FROM [dbo].[Jugador] WHERE [id] = @jugador_id FOR JSON PATH);
+        
+        SELECT @jugador_id AS id;
     END TRY
     BEGIN CATCH
         THROW;
@@ -130,8 +172,9 @@ BEGIN
 END
 GO
 
-
---ELIMINAR
+-- =============================================
+-- Procedimiento para eliminar jugador con bitácora
+-- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[Admin_DeleteJugador]
     @admin_email NVARCHAR(255),
     @jugador_id INT
@@ -144,6 +187,10 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM [dbo].[Admin] WHERE [email] = @admin_email)
             RAISERROR('Acceso no autorizado', 16, 1);
             
+        -- Validar que el jugador existe
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[Jugador] WHERE [id] = @jugador_id)
+            RAISERROR('Jugador no encontrado', 16, 1);
+            
         -- Verificar que no tenga observaciones
         IF EXISTS (SELECT 1 FROM [dbo].[Observaciones_Jugador] WHERE [id_atleta] = @jugador_id)
             RAISERROR('No se puede eliminar, el jugador tiene observaciones registradas', 16, 1);
@@ -152,12 +199,23 @@ BEGIN
         IF EXISTS (SELECT 1 FROM [dbo].[Category_players] WHERE [id_player] = @jugador_id)
             RAISERROR('No se puede eliminar, el jugador está asignado a categorías', 16, 1);
             
+        -- Guardar datos antiguos para bitácora
+        DECLARE @old_data NVARCHAR(MAX) = (
+            SELECT * FROM [dbo].[Jugador] WHERE [id] = @jugador_id FOR JSON PATH
+        );
+            
         -- Eliminar jugador
         DELETE FROM [dbo].[Jugador]
         WHERE [id] = @jugador_id;
         
-        IF @@ROWCOUNT = 0
-            RAISERROR('Jugador no encontrado', 16, 1);
+        -- Registrar en bitácora
+        EXEC [dbo].[sp_RegistrarBitacora]
+            @usuario = @admin_email,
+            @tabla = 'Jugador',
+            @accion = 'DELETE',
+            @valores_anteriores = @old_data;
+        
+        SELECT 1 AS resultado;
     END TRY
     BEGIN CATCH
         THROW;
