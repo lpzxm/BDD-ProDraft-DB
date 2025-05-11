@@ -1,9 +1,13 @@
 <?php
-$serverName = "MEDINALAPTOP\\SQLDEVELOPERPR";  // Nota: el punto se reemplaza por guión
-$database = "prodraftdb";         // Nombre de tu base de datos
-$username = "sa";                   // Vacío para autenticación Windows
-$password = "12345";                   // Vacío para autenticación Windows
+// $serverName = "MEDINALAPTOP\\SQLDEVELOPERPR";  // Nota: el punto se reemplaza por guión
+// $database = "prodraftdb";         // Nombre de tu base de datos
+// $username = "sa";                   // Vacío para autenticación Windows
+// $password = "12345";                    // Vacío para autenticación Windows
 
+$serverName = "localhost";  // Nota: el punto se reemplaza por guión
+$database = "prodraftdb";         // Nombre de tu base de datos
+$username = "";                   // Vacío para autenticación Windows
+$password = "";                   // Vacío para autenticación Windows
 try {
     // Configuración para autenticación Windows
     $dsn = "sqlsrv:Server=$serverName;Database=$database;TrustServerCertificate=true";
