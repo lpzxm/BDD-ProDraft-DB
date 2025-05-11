@@ -1,0 +1,109 @@
+# Anotaciones Internas – Fase 2 Proyecto
+
+Este documento incluye la documentación interna de cada procedimiento almacenado y trigger implementado en el proyecto.
+
+---
+
+## Procedimientos CRUD – Jugador
+
+### `SP_CreateJugador`
+- **Propósito:** Inserta un nuevo jugador en la base de datos.
+- **Validaciones:**
+  - Formato de correo.
+  - Edad entre 10 y 18 años.
+  - Grado en ('1°' a '6°').
+  - Sección como letra A-Z.
+  - Email y código únicos.
+- **Errores controlados:** 51000, 51001, 51010, 51011, 51012, 51013.
+- **Parámetros:** 8 campos del jugador.
+- **Salida:** ID insertado.
+
+### `SP_ReadJugador`
+- **Propósito:** Consulta todos los jugadores o uno específico.
+- **Validaciones:** Ninguna.
+- **Salida:** Registro(s) de jugador.
+
+### `SP_UpdateJugador`
+- **Propósito:** Actualiza datos del jugador.
+- **Validaciones:** Si se pasa cada campo:
+  - Email: formato y unicidad.
+  - FechaNacimiento: edad 10-18.
+  - Grado y sección válidos.
+  - Código: unicidad.
+- **Errores controlados:** 51002, 51003, 51004, 51010, 51011, 51012, 51013.
+- **Salida:** RowsAffected.
+
+### `SP_DeleteJugador`
+- **Propósito:** Elimina un jugador según ID.
+- **Validaciones:** Verifica existencia.
+- **Errores controlados:** 51005.
+- **Salida:** RowsDeleted.
+
+---
+
+## Procedimientos de Negocio
+
+### `SP_ReportePuntajes`
+- **Propósito:** Devuelve jugadores con promedio ≥ @MinPromedio.
+- **Validaciones:** Ninguna.
+- **Parámetros:** `@MinPromedio INT`
+- **Salida:** Lista con promedio.
+
+### `SP_ActualizarStatusSport`
+- **Propósito:** Marca como 'Activo' o 'Pendiente' según promedio.
+- **Estructuras usadas:** CTE, `CASE`, `TRY...CATCH`.
+- **Validaciones:**
+  - `@MinPromedio` no nulo ni negativo.
+- **Errores controlados:** 53000, 53001.
+- **Salida:** `JugadoresActualizados`.
+
+### `SP_MarcarRevision`
+- **Propósito:** Marca como 'Revisión' a los jugadores con promedio bajo.
+- **Estructuras usadas:** `WHILE`, tabla temporal, `AVG`.
+- **Parámetros:** `@MaxPromedio INT`
+- **Errores controlados:** 52000.
+- **Salida:** `CantJugadores`.
+
+---
+
+## Triggers de Bitácora
+
+**Generan entrada en `Bitacora` con:**
+- `Usuario_sistema`
+- `Fecha_hora_sistema`
+- `Nombre_tabla`
+- `Tipo_transaccion`
+- `Clave_afectada`
+- `Datos_antiguos` (UPDATE/DELETE)
+- `Datos_nuevos` (INSERT/UPDATE)
+
+### `TRG_Bitacora_Insert_Jugador`
+- **Evento:** INSERT sobre `Jugador`
+
+### `TRG_Bitacora_Update_Jugador`
+- **Evento:** UPDATE sobre `Jugador`
+
+### `TRG_Bitacora_Delete_Jugador`
+- **Evento:** DELETE sobre `Jugador`
+
+### `TRG_Bitacora_Insert_Admin`
+- **Evento:** INSERT sobre `Admin`
+
+### `TRG_Bitacora_Update_Admin`
+- **Evento:** UPDATE sobre `Admin`
+
+### `TRG_Bitacora_Delete_Admin`
+- **Evento:** DELETE sobre `Admin`
+
+### `TRG_Bitacora_Insert_Entrenador`
+- **Evento:** INSERT sobre `Entrenador`
+
+### `TRG_Bitacora_Update_Entrenador`
+- **Evento:** UPDATE sobre `Entrenador`
+
+### `TRG_Bitacora_Delete_Entrenador`
+- **Evento:** DELETE sobre `Entrenador`
+
+---
+
+**Todos los SP y triggers incluyen manejo de errores con `TRY...CATCH` y `RAISERROR`, además de validaciones según las reglas del modelo.**

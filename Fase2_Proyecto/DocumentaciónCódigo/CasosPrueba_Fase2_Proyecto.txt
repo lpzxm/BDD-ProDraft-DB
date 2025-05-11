@@ -1,0 +1,110 @@
+# Casos de Prueba – Fase 2 Proyecto
+
+Este documento describe los casos de prueba utilizados para verificar el funcionamiento de los procedimientos CRUD, de negocio y los triggers, tanto en flujo normal como en situaciones excepcionales.
+
+---
+
+## 🟢 CRUD – Jugador
+
+### 1. Crear Jugador – flujo normal
+EXEC dbo.SP_CreateJugador
+  @email = 'test@colegio.edu',
+  @contraseña = 'T@1234',
+  @nombres = 'Test',
+  @apellidos = 'User',
+  @fechaNacimiento = '2010-05-01',
+  @codigo = 2001,
+  @grado = '3°',
+  @seccion = 'B';
+-- Resultado esperado: ID del nuevo jugador creado.
+
+### 2. Crear Jugador – email duplicado
+EXEC dbo.SP_CreateJugador
+  @email = 'test@colegio.edu', -- ya usado
+  @contraseña = 'T@111',
+  @nombres = 'Dup',
+  @apellidos = 'Error',
+  @fechaNacimiento = '2011-02-01',
+  @codigo = 2002,
+  @grado = '4°',
+  @seccion = 'C';
+-- Resultado esperado: Error 51000 – correo duplicado.
+
+### 3. Actualizar jugador – grado y sección
+EXEC dbo.SP_UpdateJugador
+  @id_player = 1,
+  @grado = '5°',
+  @seccion = 'A';
+-- Resultado esperado: RowsAffected = 1.
+
+### 4. Actualizar jugador – fechaNacimiento fuera de rango
+EXEC dbo.SP_UpdateJugador
+  @id_player = 1,
+  @fechaNacimiento = '1995-01-01';
+-- Resultado esperado: Error 51011 – edad fuera de rango.
+
+---
+
+## 🟡 Procedimientos de negocio
+
+### 5. Reporte de promedios ≥ 14
+EXEC dbo.SP_ReportePuntajes @MinPromedio = 14;
+-- Resultado esperado: Lista de jugadores con promedio mayor o igual a 14.
+
+### 6. Actualizar status_sport masivo (≥14)
+EXEC dbo.SP_ActualizarStatusSport @MinPromedio = 14;
+-- Resultado esperado: Jugadores con promedio ≥ 14 marcados como 'Activo'; el resto como 'Pendiente'.
+
+### 7. Marcar en Revisión promedios bajos (<12)
+EXEC dbo.SP_MarcarRevision @MaxPromedio = 12;
+-- Resultado esperado: Jugadores con promedio < 12 marcados como 'Revisión'. Devuelve cantidad total afectados.
+
+---
+
+## 🔴 Excepciones y validaciones
+
+### 8. Crear jugador – email mal formado
+EXEC dbo.SP_CreateJugador
+  @email = 'malformado',
+  @contraseña = '123',
+  @nombres = 'Err',
+  @apellidos = 'Formato',
+  @fechaNacimiento = '2012-03-03',
+  @codigo = 3001,
+  @grado = '1°',
+  @seccion = 'D';
+-- Resultado esperado: Error 51010 – formato de email incorrecto.
+
+### 9. Crear jugador – grado no permitido
+EXEC dbo.SP_CreateJugador
+  @email = 'otro@colegio.edu',
+  @contraseña = 'abc',
+  @nombres = 'Grado',
+  @apellidos = 'Errado',
+  @fechaNacimiento = '2010-03-03',
+  @codigo = 3002,
+  @grado = '7°',
+  @seccion = 'E';
+-- Resultado esperado: Error 51012 – grado no permitido.
+
+---
+
+## 🔍 Trazabilidad – Bitácora
+
+### 10. Insertar, actualizar y borrar admin
+-- Insert
+INSERT INTO dbo.Admin (nombre, apellidos, email, contraseña)
+VALUES ('Trigger', 'Admin', 'admin@colegio.edu', 'Adm123');
+
+-- Update
+UPDATE dbo.Admin
+SET nombre = 'Modificado'
+WHERE email = 'admin@colegio.edu';
+
+-- Delete
+DELETE FROM dbo.Admin
+WHERE email = 'admin@colegio.edu';
+
+-- Verificación:
+SELECT * FROM dbo.Bitacora WHERE Nombre_tabla = 'Admin' ORDER BY Fecha_hora_sistema DESC;
+-- Resultado esperado: 3 registros (INSERT, UPDATE, DELETE).
