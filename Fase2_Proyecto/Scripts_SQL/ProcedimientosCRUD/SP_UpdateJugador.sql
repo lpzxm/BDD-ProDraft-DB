@@ -5,35 +5,6 @@ IF OBJECT_ID('dbo.SP_UpdateJugador', 'P') IS NOT NULL
     DROP PROCEDURE dbo.SP_UpdateJugador;
 GO
 
-/**
-  SP_UpdateJugador
-  Descripción:
-    Actualiza los datos de un jugador. Valida, si se proporcionan, los campos:
-      – Formato de email.
-      – Edad (a partir de nueva fechaNacimiento) entre 10–18 años.
-      – Grado válido (1°–6°) y sección (A–Z).
-      – Unicidad de email y código.
-  Parámetros:
-    @id_player       INT            – ID del jugador a modificar (requerido)
-    @email           NVARCHAR(255)  – (Opcional) Nuevo correo
-    @contraseña      NVARCHAR(255)  – (Opcional) Nueva contraseña
-    @nombres         NVARCHAR(255)  – (Opcional) Nuevos nombres
-    @apellidos       NVARCHAR(255)  – (Opcional) Nuevos apellidos
-    @fechaNacimiento DATE           – (Opcional) Nueva fecha de nacimiento
-    @codigo          INT            – (Opcional) Nuevo código
-    @grado           NVARCHAR(50)   – (Opcional) Nuevo grado (1°–6°)
-    @seccion         NVARCHAR(50)   – (Opcional) Nueva sección (A–Z)
-  Salida:
-    RowsAffected INT – Número de filas actualizadas
-  Errores:
-    51002 – Jugador no existe.
-    51010 – Formato de email inválido.
-    51011 – Edad fuera de rango (10–18 años).
-    51012 – Grado no válido.
-    51013 – Sección no válida.
-    51003 – Email duplicado.
-    51004 – Código duplicado.
-**/
 CREATE PROCEDURE dbo.SP_UpdateJugador
     @id_player         INT,
     @email             NVARCHAR(255)     = NULL,
@@ -74,7 +45,11 @@ BEGIN
                                        AND DAY(@fechaNacimiento)>DAY(GETDATE()))
                                  THEN 1 ELSE 0 END;
             IF @edad < 10 OR @edad > 18
-                THROW 51011, 'Edad fuera de rango (10-18 años). Edad calculada: ' + CAST(@edad AS NVARCHAR(3)), 1;
+            BEGIN
+                DECLARE @msgEdad NVARCHAR(255) = 
+                    'Edad fuera de rango (10-18 años). Edad calculada: ' + CAST(@edad AS NVARCHAR(3));
+                THROW 51011, @msgEdad, 1;
+            END
         END
 
         IF @grado IS NOT NULL
@@ -111,27 +86,152 @@ BEGIN
     END TRY
     BEGIN CATCH
         DECLARE @errMsg NVARCHAR(4000) = ERROR_MESSAGE();
-        DECLARE @errNum INT         = ERROR_NUMBER();
+        DECLARE @errNum INT = ERROR_NUMBER();
         RAISERROR(@errMsg, 16, 1);
         RETURN @errNum;
     END CATCH
 END;
 GO
 
-
-
--- 1) Intentar actualizar email a formato inválido
+-- 1) Email inválido
 EXEC dbo.SP_UpdateJugador 
     @id_player = 1, 
     @email     = 'sin-arroba.com';
 
--- 2) Cambiar fechaNacimiento fuera de rango
+-- 2) Edad fuera de rango
 EXEC dbo.SP_UpdateJugador 
     @id_player = 1, 
     @fechaNacimiento = '2000-01-01';
 
--- 3) Actualizar grado y sección correctos
+-- 3) Actualización válida
 EXEC dbo.SP_UpdateJugador 
     @id_player = 1, 
     @grado   = '5°',
     @seccion = 'B';
+
+
+--Flujo normal y con errores
+USE prodraftdb;
+GO
+
+
+-- Insertamos dos jugadores para tener datos iniciales
+INSERT INTO dbo.Jugador (email, contraseña, nombres, apellidos, fechaNacimiento, codigo, grado, seccion)
+VALUES
+  ('maria.lopez@example.com','pwwrtd','María','López','2010-06-05',4001,'4°','A'),
+  ('carlos.sanchez@example.com','perwd','Carlos','Sánchez','2009-08-20',4002,'5°','B');
+GO
+
+-- Mostrar estado inicial
+PRINT 'Estado inicial de Jugador:';
+SELECT id, email, codigo, grado, seccion FROM dbo.Jugador;
+GO
+
+-- ----------------------------------------------------------------------
+-- 2) ERROR 51002: intentar actualizar un id que NO existe (id = 99)
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51002: jugador no existe ---';
+BEGIN TRY
+    EXEC dbo.SP_UpdateJugador 
+        @id_player = 99,
+        @email     = 'nuevo.email@example.com';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10))
+          + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 3) ERROR 51010: formato de email inválido
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51010: email inválido ---';
+BEGIN TRY
+    EXEC dbo.SP_UpdateJugador 
+        @id_player = 18,
+        @email     = 'sin-arroba.com';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10))
+          + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+
+
+-- ----------------------------------------------------------------------
+-- 6) ERROR 51011: edad fuera de rango (fechaNacimiento que da edad >18)
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51011: edad fuera de rango ---';
+BEGIN TRY
+    EXEC dbo.SP_UpdateJugador 
+        @id_player       = 18,
+        @fechaNacimiento = '2000-01-01';  -- edad ≈25
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10))
+          + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 7) ERROR 51012: grado inválido
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51012: grado inválido ---';
+BEGIN TRY
+    EXEC dbo.SP_UpdateJugador 
+        @id_player = 8,
+        @grado     = '7°';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10))
+          + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 8) ERROR 51013: sección inválida
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51013: sección inválida ---';
+BEGIN TRY
+    EXEC dbo.SP_UpdateJugador 
+        @id_player = 18,
+        @seccion   = 'AA';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10))
+          + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 9) FLUJO NORMAL: actualizaciones válidas
+-- ----------------------------------------------------------------------
+PRINT '--- FLUJO NORMAL: múltiples campos válidos ---';
+BEGIN TRY
+    DECLARE @rows INT;
+    EXEC @rows = dbo.SP_UpdateJugador 
+        @id_player       = 16,
+        @email           = 'maria.actualizada@example.com',
+        @contraseña      = 'NuevaPwd123',
+        @nombres         = 'María Actualizada',
+        @apellidos       = 'López Pérez',
+        @fechaNacimiento = '2011-05-05',
+        @codigo          = 5001,
+        @grado           = '6°',
+        @seccion         = 'C';
+    PRINT 'RowsAffected = ' + CAST(@rows AS VARCHAR(10));
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10))
+          + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 10) Verificar estado final de la tabla
+-- ----------------------------------------------------------------------
+PRINT 'Estado FINAL de Jugador:';
+SELECT id, email, contraseña, nombres, apellidos, fechaNacimiento, codigo, grado, seccion
+FROM dbo.Jugador;
+GO

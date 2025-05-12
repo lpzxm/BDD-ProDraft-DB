@@ -5,33 +5,6 @@ IF OBJECT_ID('dbo.SP_CreateJugador', 'P') IS NOT NULL
     DROP PROCEDURE dbo.SP_CreateJugador;
 GO
 
-/**
-  SP_CreateJugador
-  Descripción:
-    Crea un nuevo jugador tras validar:
-      – Formato de email.
-      – Edad dentro de rango permitido (10–18 años).
-      – Unicidad de email y código.
-      – Grado válido (1°–6°) y sección (letra A–Z).
-  Parámetros:
-    @email           NVARCHAR(255)  – Correo en formato usuario@dominio.ext
-    @contraseña      NVARCHAR(255)  – Texto libre
-    @nombres         NVARCHAR(255)  – No vacío
-    @apellidos       NVARCHAR(255)  – No vacío
-    @fechaNacimiento DATE           – Fecha que genera edad 10–18
-    @codigo          INT            – Único en la tabla
-    @grado           NVARCHAR(50)   – '1°','2°','3°','4°','5°','6°'
-    @seccion         NVARCHAR(50)   – Una letra de la A a la Z
-  Salida:
-    NewJugadorId INT – ID generado
-  Errores:
-    51010 – Formato de email inválido.
-    51011 – Edad fuera de rango 10–18.
-    51012 – Grado no válido.
-    51013 – Sección no válida.
-    51000 – Email duplicado.
-    51001 – Código duplicado.
-**/
 CREATE PROCEDURE dbo.SP_CreateJugador
     @email             NVARCHAR(255),
     @contraseña        NVARCHAR(255),
@@ -58,7 +31,11 @@ BEGIN
                                    AND DAY(@fechaNacimiento)>DAY(GETDATE()))
                              THEN 1 ELSE 0 END;
         IF @edad < 10 OR @edad > 18
-            THROW 51011, 'Edad fuera de rango (10-18 años). Edad calculada: ' + CAST(@edad AS NVARCHAR(3)), 1;
+        BEGIN
+            DECLARE @msgEdad NVARCHAR(255) = 
+                'Edad fuera de rango (10-18 años). Edad calculada: ' + CAST(@edad AS NVARCHAR(3));
+            THROW 51011, @msgEdad, 1;
+        END
 
         -- 3. Grado válido
         IF @grado NOT IN ('1°','2°','3°','4°','5°','6°')
@@ -84,9 +61,163 @@ BEGIN
     END TRY
     BEGIN CATCH
         DECLARE @errMsg NVARCHAR(4000) = ERROR_MESSAGE();
-        DECLARE @errNum INT         = ERROR_NUMBER();
+        DECLARE @errNum INT = ERROR_NUMBER();
         RAISERROR(@errMsg, 16, 1);
         RETURN @errNum;
     END CATCH
 END;
 GO
+
+--Ejecucion de flujo normal y con errores
+USE prodraftdb;
+GO
+
+-- ----------------------------------------------------------------------
+-- 1) Asegurarnos de partir de una tabla limpia
+-- ----------------------------------------------------------------------
+TRUNCATE TABLE dbo.Jugador;
+GO
+
+-- ----------------------------------------------------------------------
+-- 2) Flujo NORMAL: inserción válida
+-- ----------------------------------------------------------------------
+PRINT '--- FLUJO NORMAL: inserción válida ---';
+BEGIN TRY
+    DECLARE @newId INT;
+    EXEC dbo.SP_CreateJugador
+        @email           = 'juan.perez@example.com',
+        @contraseña      = 'Secreto123',
+        @nombres         = 'Juan',
+        @apellidos       = 'Pérez',
+        @fechaNacimiento = '2010-05-15',
+        @codigo          = 1001,
+        @grado           = '5°',
+        @seccion         = 'C';
+    SELECT @newId = NewJugadorId FROM (SELECT SCOPE_IDENTITY() AS NewJugadorId) AS T;
+    PRINT 'Jugador creado con ID = ' + CAST(@newId AS VARCHAR(10));
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 3) ERROR 51010: formato de email inválido
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51010: email inválido ---';
+BEGIN TRY
+    EXEC dbo.SP_CreateJugador
+        @email           = 'sin-arroba.com',
+        @contraseña      = 'pwd',
+        @nombres         = 'Ana',
+        @apellidos       = 'Lopez',
+        @fechaNacimiento = '2012-01-01',
+        @codigo          = 1002,
+        @grado           = '3°',
+        @seccion         = 'A';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 4) ERROR 51011: edad fuera de rango (<10 o >18)
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51011: edad fuera de rango ---';
+BEGIN TRY
+    EXEC dbo.SP_CreateJugador
+        @email           = 'pedro.ramirez@example.com',
+        @contraseña      = 'pwd',
+        @nombres         = 'Pedro',
+        @apellidos       = 'Ramírez',
+        @fechaNacimiento = '2000-01-01',
+        @codigo          = 1003,
+        @grado           = '4°',
+        @seccion         = 'B';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 5) ERROR 51012: grado inválido
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51012: grado inválido ---';
+BEGIN TRY
+    EXEC dbo.SP_CreateJugador
+        @email           = 'laura.mendez@example.com',
+        @contraseña      = 'pwd',
+        @nombres         = 'Laura',
+        @apellidos       = 'Méndez',
+        @fechaNacimiento = '2011-07-20',
+        @codigo          = 1004,
+        @grado           = '7°',
+        @seccion         = 'D';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 6) ERROR 51013: sección inválida
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51013: sección inválida ---';
+BEGIN TRY
+    EXEC dbo.SP_CreateJugador
+        @email           = 'carlos.gomez@example.com',
+        @contraseña      = 'pwd',
+        @nombres         = 'Carlos',
+        @apellidos       = 'Gómez',
+        @fechaNacimiento = '2012-03-12',
+        @codigo          = 1005,
+        @grado           = '2°',
+        @seccion         = 'AA';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 7) ERROR 51000: email duplicado
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51000: email duplicado ---';
+BEGIN TRY
+    EXEC dbo.SP_CreateJugador
+        @email           = 'juan.perez@example.com',
+        @contraseña      = 'otraPwd',
+        @nombres         = 'Juan2',
+        @apellidos       = 'Pérez2',
+        @fechaNacimiento = '2010-06-10',
+        @codigo          = 1006,
+        @grado           = '5°',
+        @seccion         = 'C';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+
+-- ----------------------------------------------------------------------
+-- 8) ERROR 51001: código duplicado
+-- ----------------------------------------------------------------------
+PRINT '--- ERROR 51001: código duplicado ---';
+BEGIN TRY
+    EXEC dbo.SP_CreateJugador
+        @email           = 'sofia.ramos@example.com',
+        @contraseña      = 'pwd',
+        @nombres         = 'Sofía',
+        @apellidos       = 'Ramos',
+        @fechaNacimiento = '2011-11-11',
+        @codigo          = 1001,
+        @grado           = '6°',
+        @seccion         = 'E';
+END TRY
+BEGIN CATCH
+    PRINT 'ERROR ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + ': ' + ERROR_MESSAGE();
+END CATCH;
+GO
+

@@ -2,6 +2,7 @@
 USE [master]
 GO
 CREATE DATABASE [prodraftdb]
+GO
 
 -- Usar la base de datos creada
 USE [prodraftdb]
